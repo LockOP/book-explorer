@@ -147,7 +147,7 @@ const SearchBar: React.FC = () => {
     const handleResize = () => {
       if (window.innerWidth < DEFAULT_VALUES.MOBILE_BREAKPOINT && filters.viewMode !== "list") {
         dispatch(setViewMode("list"));
-        setUrlViewMode("list"); // Update URL
+        setUrlViewMode("list");
       }
     };
 
@@ -158,7 +158,7 @@ const SearchBar: React.FC = () => {
 
   const handleSortChange = (value: string) => {
     dispatch(setSortBy(value as SortOption));
-    setUrlSortBy(value as SortOption); // Update URL
+    setUrlSortBy(value as SortOption);
     dispatch(resetBooks());
 
     notificationService.notifySortChanged(SORT_OPTIONS[value as SortOption]);

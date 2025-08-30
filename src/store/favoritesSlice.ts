@@ -60,7 +60,6 @@ const favoritesSlice = createSlice({
         (book) => book.key !== bookId
       );
 
-      // Update Redux state with fresh data
       state.bookIds = currentFavorites.bookIds;
       state.books = currentFavorites.books;
 
