@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Book, BookSearchResponse, SortOption } from "../types";
-
-const BASE_URL = "https://openlibrary.org";
+import { API_CONFIG, DEFAULT_VALUES } from "../config";
 
 export interface SearchParams {
   query: string;
@@ -14,19 +13,22 @@ export const searchBooks = async (
   params: SearchParams
 ): Promise<BookSearchResponse> => {
   try {
-    const query = params.query.trim() || "type:work";
-    const sort = params.sort || "rating desc";
+    const query = params.query.trim() || DEFAULT_VALUES.DEFAULT_SEARCH_QUERY;
+    const sort = params.sort || DEFAULT_VALUES.DEFAULT_SORT;
 
-    const response = await axios.get(`${BASE_URL}/search.json`, {
-      params: {
-        q: query,
-        offset: params.offset || 0,
-        limit: params.limit || 20,
-        sort: sort,
-        fields:
-          "key,title,author_name,author_key,cover_i,first_publish_year,publisher,isbn,number_of_pages_median,subject,description",
-      },
-    });
+    const response = await axios.get(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SEARCH}`,
+      {
+        params: {
+          q: query,
+          offset: params.offset || DEFAULT_VALUES.SEARCH_OFFSET,
+          limit: params.limit || DEFAULT_VALUES.SEARCH_LIMIT,
+          sort: sort,
+          fields: DEFAULT_VALUES.DEFAULT_BOOK_FIELDS,
+        },
+        timeout: API_CONFIG.TIMEOUT,
+      }
+    );
 
     return response.data;
   } catch (error) {
@@ -42,7 +44,12 @@ export const searchBooks = async (
 
 export const getBookDetails = async (bookId: string): Promise<Book | null> => {
   try {
-    const response = await axios.get(`${BASE_URL}/works/${bookId}.json`);
+    const response = await axios.get(
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.BOOK_DETAILS}/${bookId}.json`,
+      {
+        timeout: API_CONFIG.TIMEOUT,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching book details from Open Library API:", error);

@@ -2,17 +2,17 @@ import { store } from "../store";
 import { addNotification } from "../store/notificationsSlice";
 import { toast } from "sonner";
 import { NotificationType, BookChange } from "../types";
+import { NOTIFICATION_CONFIG } from "../config";
 import axios from "axios";
 
 const lastNotificationTimes: Record<string, number> = {};
-const NOTIFICATION_COOLDOWN = 3000;
 
 const canShowNotification = (notificationType: string): boolean => {
   const now = Date.now();
   const lastTime = lastNotificationTimes[notificationType] || 0;
   const timeSinceLastNotification = now - lastTime;
 
-  if (timeSinceLastNotification >= NOTIFICATION_COOLDOWN) {
+  if (timeSinceLastNotification >= NOTIFICATION_CONFIG.COOLDOWN_DURATION) {
     lastNotificationTimes[notificationType] = now;
     return true;
   }

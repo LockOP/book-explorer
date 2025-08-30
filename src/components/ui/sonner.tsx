@@ -1,6 +1,7 @@
 import React from "react";
 import { Toaster as Sonner } from "sonner";
 import { useAppSelector } from "../../hooks/redux";
+import { DEFAULT_VALUES } from "../../config";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -11,8 +12,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme === "dark" ? "dark" : "light"}
       className="toaster group"
-      duration={3000}
-      position="top-center"
+      duration={DEFAULT_VALUES.TOAST_DURATION}
+      position={DEFAULT_VALUES.TOAST_POSITION}
       toastOptions={{
         classNames: {
           toast:

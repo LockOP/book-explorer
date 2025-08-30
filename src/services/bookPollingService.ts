@@ -1,55 +1,21 @@
 import axios from "axios";
 import { BookChange } from "../types";
+import { API_CONFIG, STORAGE_KEYS, NOTIFICATION_CONFIG } from "../config";
 
-const BASE_URL = "https://openlibrary.org";
-
-let lastSeenAddBookId: string | null = null;
-let lastSeenEditBookId: string | null = null;
-let isPolling: boolean = false;
 let pollTimer: NodeJS.Timeout | null = null;
-let onNewChanges: ((changes: BookChange[]) => void) | null = null;
-
-const loadLastSeenIds = (): void => {
-  try {
-    const savedAddBook = localStorage.getItem("bookExplorer_lastSeenAddBookId");
-    const savedEditBook = localStorage.getItem(
-      "bookExplorer_lastSeenEditBookId"
-    );
-
-    if (savedAddBook) lastSeenAddBookId = savedAddBook;
-    if (savedEditBook) lastSeenEditBookId = savedEditBook;
-  } catch (error) {
-    console.error("Error loading last seen IDs from localStorage:", error);
-  }
-};
-
-const saveLastSeenIds = (): void => {
-  try {
-    if (lastSeenAddBookId) {
-      localStorage.setItem("bookExplorer_lastSeenAddBookId", lastSeenAddBookId);
-    }
-    if (lastSeenEditBookId) {
-      localStorage.setItem(
-        "bookExplorer_lastSeenEditBookId",
-        lastSeenEditBookId
-      );
-    }
-  } catch (error) {
-    console.error("Error saving last seen IDs to localStorage:", error);
-  }
-};
 
 const fetchBookChanges = async (
   kind: "add-book" | "edit-book"
 ): Promise<BookChange[]> => {
   try {
     const response = await axios.get<BookChange[]>(
-      `${BASE_URL}/recentchanges/${kind}.json`,
+      `${API_CONFIG.BASE_URL}/recentchanges/${kind}.json`,
       {
         params: {
-          limit: 5,
+          limit: NOTIFICATION_CONFIG.POLLING_CHANGES_LIMIT,
           bot: false,
         },
+        timeout: API_CONFIG.TIMEOUT,
       }
     );
 
@@ -63,8 +29,7 @@ const fetchBookChanges = async (
 
 const getNewChanges = (
   changes: BookChange[],
-  lastSeenId: string | null,
-  changeType: string
+  lastSeenId: string | null
 ): BookChange[] => {
   if (!lastSeenId) {
     return changes;
@@ -81,79 +46,47 @@ const getNewChanges = (
   return newChanges;
 };
 
-const pollForChanges = async (): Promise<BookChange[]> => {
+const pollForChanges = async (callback: (changes: BookChange[]) => void): Promise<void> => {
   try {
-    const currentLastSeenAddBookId = localStorage.getItem(
-      "bookExplorer_lastSeenAddBookId"
-    );
-    const currentLastSeenEditBookId = localStorage.getItem(
-      "bookExplorer_lastSeenEditBookId"
-    );
+    const lastSeenAddBookId = localStorage.getItem(STORAGE_KEYS.LAST_SEEN_ADD_BOOK_ID);
+    const lastSeenEditBookId = localStorage.getItem(STORAGE_KEYS.LAST_SEEN_EDIT_BOOK_ID);
 
     const addBookChanges = await fetchBookChanges("add-book");
     const editBookChanges = await fetchBookChanges("edit-book");
 
-    const newAddBookChanges = getNewChanges(
-      addBookChanges,
-      currentLastSeenAddBookId,
-      "add-book"
-    );
-    const newEditBookChanges = getNewChanges(
-      editBookChanges,
-      currentLastSeenEditBookId,
-      "edit-book"
-    );
+    const newAddBookChanges = getNewChanges(addBookChanges, lastSeenAddBookId);
+    const newEditBookChanges = getNewChanges(editBookChanges, lastSeenEditBookId);
 
     const allNewChanges = [...newAddBookChanges, ...newEditBookChanges];
 
-    if (allNewChanges.length > 0 && onNewChanges) {
-      const currentCallback = onNewChanges;
-      onNewChanges = null;
-
+    if (allNewChanges.length > 0) {
       try {
-        currentCallback(allNewChanges);
+        callback(allNewChanges);
       } catch (error) {
         console.error("Error in notification callback:", error);
-      } finally {
-        onNewChanges = currentCallback;
       }
     }
 
     if (addBookChanges.length > 0) {
-      lastSeenAddBookId = addBookChanges[0].id;
+      localStorage.setItem(STORAGE_KEYS.LAST_SEEN_ADD_BOOK_ID, addBookChanges[0].id);
     }
     if (editBookChanges.length > 0) {
-      lastSeenEditBookId = editBookChanges[0].id;
+      localStorage.setItem(STORAGE_KEYS.LAST_SEEN_EDIT_BOOK_ID, editBookChanges[0].id);
     }
-
-    saveLastSeenIds();
-
-    return allNewChanges;
   } catch (error) {
     console.error("Error polling for book changes:", error);
-    return [];
   }
 };
 
-export const startPolling = (
-  callback: (changes: BookChange[]) => void,
-  pollInterval: number = 10000
-): void => {
-  if (isPolling) {
+export const startPolling = (callback: (changes: BookChange[]) => void): void => {
+  if (!NOTIFICATION_CONFIG.POLLING_ENABLED || pollTimer) {
     return;
   }
 
-  if (pollTimer) {
-    clearInterval(pollTimer);
-    pollTimer = null;
-  }
+  stopPolling();
 
-  onNewChanges = callback;
-  isPolling = true;
-
-  pollForChanges();
-
-  pollTimer = setInterval(pollForChanges, pollInterval);
+  pollForChanges(callback);
+  pollTimer = setInterval(() => pollForChanges(callback), NOTIFICATION_CONFIG.POLLING_INTERVAL);
 };
 
 export const stopPolling = (): void => {
@@ -161,10 +94,4 @@ export const stopPolling = (): void => {
     clearInterval(pollTimer);
     pollTimer = null;
   }
-  isPolling = false;
-  onNewChanges = null;
 };
-
-export const getPollingStatus = (): boolean => isPolling;
-
-loadLastSeenIds();

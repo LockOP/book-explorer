@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { SortOption } from "../types";
+import { DEFAULT_VALUES, SORT_OPTIONS } from "../config";
 
 const SearchBar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,7 +36,7 @@ const SearchBar: React.FC = () => {
   } = useUrlState();
 
   const getDisplaySearchValue = (search: string) => {
-    return search === "type:work" || !search ? "" : search;
+    return search === DEFAULT_VALUES.DEFAULT_SEARCH_QUERY || !search ? "" : search;
   };
 
   const [searchTerm, setSearchTerm] = useState(
@@ -43,7 +44,7 @@ const SearchBar: React.FC = () => {
   );
   const [isClearing, setIsClearing] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, DEFAULT_VALUES.DEBOUNCE_DELAY);
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterFocused, setIsFilterFocused] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -91,7 +92,7 @@ const SearchBar: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < DEFAULT_VALUES.MOBILE_BREAKPOINT);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -114,8 +115,8 @@ const SearchBar: React.FC = () => {
       if (debouncedSearchTerm.trim()) {
         const searchParams = {
           query: debouncedSearchTerm,
-          offset: 0,
-          limit: 20,
+          offset: DEFAULT_VALUES.SEARCH_OFFSET,
+          limit: DEFAULT_VALUES.SEARCH_LIMIT,
           sort: filters.sortBy,
         };
         dispatch(fetchBooks(searchParams)).then((result) => {
@@ -128,7 +129,7 @@ const SearchBar: React.FC = () => {
           }
         });
       } else {
-        dispatch(setSearch("type:work"));
+        dispatch(setSearch(DEFAULT_VALUES.DEFAULT_SEARCH_QUERY));
       }
     }
   }, [
@@ -144,7 +145,7 @@ const SearchBar: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768 && filters.viewMode !== "list") {
+      if (window.innerWidth < DEFAULT_VALUES.MOBILE_BREAKPOINT && filters.viewMode !== "list") {
         dispatch(setViewMode("list"));
         setUrlViewMode("list"); // Update URL
       }
@@ -160,27 +161,20 @@ const SearchBar: React.FC = () => {
     setUrlSortBy(value as SortOption); // Update URL
     dispatch(resetBooks());
 
-    const sortLabels: Record<SortOption, string> = {
-      "rating desc": "Popular",
-      title: "Title",
-      new: "Newest",
-      old: "Oldest",
-      "random.daily": "Random",
-    };
-    notificationService.notifySortChanged(sortLabels[value as SortOption]);
+    notificationService.notifySortChanged(SORT_OPTIONS[value as SortOption]);
 
     const query = filters.search.trim() || "";
     const searchParams = {
       query,
-      offset: 0,
-      limit: 20,
+      offset: DEFAULT_VALUES.SEARCH_OFFSET,
+      limit: DEFAULT_VALUES.SEARCH_LIMIT,
       sort: value as SortOption,
     };
     dispatch(fetchBooks(searchParams));
   };
 
   const handleViewModeChange = (mode: "grid" | "list") => {
-    if (window.innerWidth >= 768) {
+    if (window.innerWidth >= DEFAULT_VALUES.MOBILE_BREAKPOINT) {
       if (filters.viewMode === mode) {
         return;
       }
@@ -196,15 +190,15 @@ const SearchBar: React.FC = () => {
 
     setSearchTerm("");
 
-    dispatch(setSearch("type:work"));
-    setUrlSearch("type:work");
+    dispatch(setSearch(DEFAULT_VALUES.DEFAULT_SEARCH_QUERY));
+    setUrlSearch(DEFAULT_VALUES.DEFAULT_SEARCH_QUERY);
 
     dispatch(resetBooks());
 
     const searchParams = {
-      query: "type:work",
-      offset: 0,
-      limit: 20,
+      query: DEFAULT_VALUES.DEFAULT_SEARCH_QUERY,
+      offset: DEFAULT_VALUES.SEARCH_OFFSET,
+      limit: DEFAULT_VALUES.SEARCH_LIMIT,
       sort: filters.sortBy,
     };
 
@@ -212,7 +206,7 @@ const SearchBar: React.FC = () => {
 
     setTimeout(() => {
       setIsClearing(false);
-    }, 600);
+    }, DEFAULT_VALUES.CLEAR_DELAY);
   };
 
   const handleFilterFocus = () => {
@@ -293,11 +287,11 @@ const SearchBar: React.FC = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="rating desc">Popular</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="new">Newest</SelectItem>
-                <SelectItem value="old">Oldest</SelectItem>
-                <SelectItem value="random.daily">Random</SelectItem>
+                {Object.entries(SORT_OPTIONS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 

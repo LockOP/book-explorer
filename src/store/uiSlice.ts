@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { STORAGE_KEYS, DEFAULT_VALUES } from "../config";
 
 interface UIState {
   theme: "light" | "dark";
@@ -9,19 +10,19 @@ interface UIState {
 
 const loadThemeFromStorage = (): "light" | "dark" => {
   try {
-    const stored = localStorage.getItem("book-explorer-theme");
+    const stored = localStorage.getItem(STORAGE_KEYS.THEME);
     if (stored === "dark" || stored === "light") {
       return stored;
     }
   } catch (error) {
     console.error("Failed to load theme from storage:", error);
   }
-  return "light";
+  return DEFAULT_VALUES.DEFAULT_THEME;
 };
 
 const saveThemeToStorage = (theme: "light" | "dark") => {
   try {
-    localStorage.setItem("book-explorer-theme", theme);
+    localStorage.setItem(STORAGE_KEYS.THEME, theme);
   } catch (error) {
     console.error("Failed to save theme to storage:", error);
   }

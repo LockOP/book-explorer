@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { SortOption, ViewMode } from "../types";
+import { DEFAULT_VALUES } from "../config";
 
 interface URLState {
   search: string;
@@ -8,9 +9,9 @@ interface URLState {
 }
 
 const DEFAULT_STATE: URLState = {
-  search: "type:work",
-  sortBy: "rating desc",
-  viewMode: "grid",
+  search: DEFAULT_VALUES.DEFAULT_SEARCH_QUERY,
+  sortBy: DEFAULT_VALUES.DEFAULT_SORT,
+  viewMode: DEFAULT_VALUES.DEFAULT_VIEW_MODE,
 };
 
 export const useUrlState = () => {

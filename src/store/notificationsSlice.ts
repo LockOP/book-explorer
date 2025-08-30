@@ -1,19 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Notification } from "../types";
+import { STORAGE_KEYS, NOTIFICATION_CONFIG } from "../config";
 
 interface NotificationsState {
   notifications: Notification[];
   unreadCount: number;
 }
 
-const NOTIFICATIONS_STORAGE_KEY = "bookExplorer_notifications";
-
 const performCleanup = (notifications: Notification[]): Notification[] => {
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  let cleaned = notifications.filter((n) => n.timestamp > sevenDaysAgo);
+  const retentionCutoff =
+    Date.now() -
+    NOTIFICATION_CONFIG.CLEANUP_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  let cleaned = notifications.filter((n) => n.timestamp > retentionCutoff);
 
-  if (cleaned.length > 25) {
-    cleaned = cleaned.sort((a, b) => b.timestamp - a.timestamp).slice(0, 25);
+  if (cleaned.length > NOTIFICATION_CONFIG.CLEANUP_MAX_ITEMS) {
+    cleaned = cleaned
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, NOTIFICATION_CONFIG.CLEANUP_MAX_ITEMS);
   }
 
   return cleaned;
@@ -21,7 +24,7 @@ const performCleanup = (notifications: Notification[]): Notification[] => {
 
 const loadNotificationsFromStorage = (): Notification[] => {
   try {
-    const stored = localStorage.getItem(NOTIFICATIONS_STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
     if (stored) {
       const notifications = JSON.parse(stored);
 
@@ -55,7 +58,7 @@ const loadNotificationsFromStorage = (): Notification[] => {
 const saveNotificationsToStorage = (notifications: Notification[]): void => {
   try {
     localStorage.setItem(
-      NOTIFICATIONS_STORAGE_KEY,
+      STORAGE_KEYS.NOTIFICATIONS,
       JSON.stringify(notifications)
     );
   } catch (error) {

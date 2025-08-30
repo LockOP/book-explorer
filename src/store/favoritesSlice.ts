@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Book, FavoritesState } from "../types";
+import { STORAGE_KEYS } from "../config";
 
 const loadFavoritesFromStorage = (): FavoritesState => {
   try {
-    const stored = localStorage.getItem("book-explorer-favorites");
+    const stored = localStorage.getItem(STORAGE_KEYS.FAVORITES);
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
@@ -19,7 +20,7 @@ const loadFavoritesFromStorage = (): FavoritesState => {
 
 const saveFavoritesToStorage = (favorites: FavoritesState) => {
   try {
-    localStorage.setItem("book-explorer-favorites", JSON.stringify(favorites));
+    localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
   } catch (error) {
     console.error("Failed to save favorites to storage:", error);
   }

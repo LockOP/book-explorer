@@ -12,13 +12,14 @@ import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { useBookPolling } from "./hooks/bookPolling";
 import { fetchBooks, updateFiltersFromURL } from "./store/booksSlice";
 import { useUrlState } from "./hooks/urlState";
+import { DEFAULT_VALUES } from "./config";
 
 function AppContent() {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state: any) => state.ui);
   const { getStateFromURL } = useUrlState();
 
-  const { isPolling } = useBookPolling(10000);
+  const { isPolling } = useBookPolling();
 
   useEffect(() => {
     if (theme === "dark") {
@@ -30,18 +31,14 @@ function AppContent() {
 
   useEffect(() => {
     const urlState = getStateFromURL();
-    console.log("🏗️ App.tsx initializing with URL state:", urlState);
-
-    console.log("🏗️ App.tsx dispatching updateFiltersFromURL:", urlState);
     dispatch(updateFiltersFromURL(urlState));
 
     const searchParams = {
       query: urlState.search,
-      offset: 0,
-      limit: 20,
+      offset: DEFAULT_VALUES.SEARCH_OFFSET,
+      limit: DEFAULT_VALUES.SEARCH_LIMIT,
       sort: urlState.sortBy,
     };
-    console.log("🏗️ App.tsx fetching books with params:", searchParams);
     dispatch(fetchBooks(searchParams));
   }, [dispatch, getStateFromURL]);
 
