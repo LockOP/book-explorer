@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Book, BookSearchResponse, BookFilters } from "../types";
 import { searchBooks, SearchParams } from "../services/bookService";
+import { Book, BookSearchResponse, BookFilters, SortOption, ViewMode } from "../types";
 
 interface BooksState {
   books: Book[];
@@ -13,16 +13,41 @@ interface BooksState {
   currentOffset: number;
 }
 
+const getInitialViewMode = (): ViewMode => {
+  try {
+    const saved = localStorage.getItem('bookExplorer_viewMode');
+    return saved === 'list' || saved === 'grid' ? saved : 'grid';
+  } catch {
+    return 'grid';
+  }
+};
+
+const getInitialSortBy = (): SortOption => {
+  try {
+    const saved = localStorage.getItem('bookExplorer_sortBy');
+    return saved === 'rating desc' || saved === 'title' || saved === 'new' || saved === 'old' || saved === 'random.daily' ? saved : 'rating desc';
+  } catch {
+    return 'rating desc';
+  }
+};
+
+const getInitialSearch = (): string => {
+  try {
+    return localStorage.getItem('bookExplorer_search') || '';
+  } catch {
+    return '';
+  }
+};
+
 const initialState: BooksState = {
   books: [],
   loading: false,
   loadingMore: false,
   error: null,
   filters: {
-    search: "",
-    sortBy: "rating desc",
-    sortOrder: "asc",
-    viewMode: "grid",
+    search: getInitialSearch(),
+    sortBy: getInitialSortBy(),
+    viewMode: getInitialViewMode(),
   },
   totalResults: 0,
   hasMore: true,
@@ -51,21 +76,33 @@ const booksSlice = createSlice({
   reducers: {
     setSearch: (state, action: PayloadAction<string>) => {
       state.filters.search = action.payload;
+      try {
+        localStorage.setItem('bookExplorer_search', action.payload);
+      } catch (e) {
+        console.error('Failed to save search term to localStorage:', e);
+      }
       // Reset pagination when search changes
       state.currentOffset = 0;
       state.hasMore = true;
     },
-    setSortBy: (state, action: PayloadAction<string>) => {
+    setSortBy: (state, action: PayloadAction<SortOption>) => {
       state.filters.sortBy = action.payload;
+      try {
+        localStorage.setItem('bookExplorer_sortBy', action.payload);
+      } catch (e) {
+        console.error('Failed to save sort by to localStorage:', e);
+      }
       // Reset pagination when sort changes
       state.currentOffset = 0;
       state.hasMore = true;
     },
-    setSortOrder: (state, action: PayloadAction<"asc" | "desc">) => {
-      state.filters.sortOrder = action.payload;
-    },
-    setViewMode: (state, action: PayloadAction<"grid" | "list">) => {
+    setViewMode: (state, action: PayloadAction<ViewMode>) => {
       state.filters.viewMode = action.payload;
+      try {
+        localStorage.setItem('bookExplorer_viewMode', action.payload);
+      } catch (e) {
+        console.error('Failed to save view mode to localStorage:', e);
+      }
     },
     clearError: (state) => {
       state.error = null;
@@ -126,7 +163,6 @@ const booksSlice = createSlice({
 export const {
   setSearch,
   setSortBy,
-  setSortOrder,
   setViewMode,
   clearError,
   resetBooks,

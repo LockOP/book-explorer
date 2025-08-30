@@ -19,26 +19,32 @@ export interface BookSearchResponse {
   docs: Book[];
 }
 
+export type NotificationType = "success" | "info" | "warning" | "error";
+
 export interface Notification {
   id: string;
-  type: "success" | "info" | "warning" | "error";
+  type: NotificationType;
   title: string;
   message: string;
   timestamp: number;
   read: boolean;
 }
 
+export type SortOption = "rating desc" | "title" | "new" | "old" | "random.daily";
+export type ViewMode = "grid" | "list";
+
 export interface BookFilters {
   search: string;
-  sortBy: string; // Using Open Library API sort options
-  sortOrder: "asc" | "desc";
-  viewMode: "grid" | "list";
+  sortBy: SortOption;
+  viewMode: ViewMode;
 }
 
 export interface FavoritesState {
   bookIds: string[];
   books: Book[];
 }
+
+export type Theme = "light" | "dark";
 
 export interface AppState {
   books: Book[];
@@ -47,5 +53,5 @@ export interface AppState {
   filters: BookFilters;
   favorites: FavoritesState;
   notifications: Notification[];
-  theme: "light" | "dark";
+  theme: Theme;
 }

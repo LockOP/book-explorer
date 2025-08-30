@@ -5,7 +5,6 @@ import { useDebounce } from "../hooks/debounce";
 import {
   setSearch,
   setSortBy,
-  setSortOrder,
   setViewMode,
   fetchBooks,
   resetBooks,
@@ -20,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { SortOption } from "../types";
 
 const SearchBar: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -31,6 +31,10 @@ const SearchBar: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterFocused, setIsFilterFocused] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  useEffect(() => {
+    setSearchTerm(filters.search);
+  }, [filters.search]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -53,7 +57,6 @@ const SearchBar: React.FC = () => {
           sort: filters.sortBy,
         };
         dispatch(fetchBooks(searchParams)).then((result) => {
-          // Add notification after search is completed
           if (result.meta.requestStatus === "fulfilled" && result.payload) {
             const response = result.payload as any;
             notificationService.notifySearchResultsUpdated(
@@ -83,7 +86,7 @@ const SearchBar: React.FC = () => {
   }, [dispatch, filters.viewMode]);
 
   const handleSortChange = (value: string) => {
-    dispatch(setSortBy(value));
+    dispatch(setSortBy(value as SortOption));
     dispatch(resetBooks()); // Clear existing books when sort changes
 
     // Trigger new search with updated sort
@@ -92,7 +95,7 @@ const SearchBar: React.FC = () => {
       query,
       offset: 0,
       limit: 20,
-      sort: value,
+      sort: value as SortOption,
     };
     dispatch(fetchBooks(searchParams));
   };

@@ -5,7 +5,7 @@
   "homepage": "https://github.com/LockOP/book-explorer",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve --mode development",
+    "dev": "webpack serve --mode development --open",
     "build": "webpack --mode production",
     "start": "webpack serve --open --mode development",
     "serve": "webpack serve --mode development --open --port 3000",

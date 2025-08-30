@@ -11,6 +11,7 @@ import BookDetailsModal from "./components/BookDetailsModal";
 import { Toaster } from "./components/ui/sonner";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { fetchBooks } from "./store/booksSlice";
+import { SortOption } from "./types";
 
 function AppContent() {
   const dispatch = useAppDispatch();
@@ -26,11 +27,15 @@ function AppContent() {
 
   useEffect(() => {
     notificationService.startPolling();
+    
+    const savedSearch = localStorage.getItem('bookExplorer_search') || 'type:work';
+    const savedSort = (localStorage.getItem('bookExplorer_sortBy') as SortOption) || 'rating desc';
+    
     const searchParams = {
-      query: "type:work",
+      query: savedSearch || 'type:work',
       offset: 0,
       limit: 20,
-      sort: "rating desc",
+      sort: savedSort,
     };
     dispatch(fetchBooks(searchParams));
     return () => {

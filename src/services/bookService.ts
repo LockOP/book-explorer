@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Book, BookSearchResponse } from "../types";
+import { Book, BookSearchResponse, SortOption } from "../types";
 
 const BASE_URL = "https://openlibrary.org";
 
@@ -7,7 +7,7 @@ export interface SearchParams {
   query: string;
   offset?: number;
   limit?: number;
-  sort?: string;
+  sort?: SortOption;
 }
 
 export const searchBooks = async (

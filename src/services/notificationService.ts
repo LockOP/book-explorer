@@ -1,6 +1,7 @@
-import { toast } from "sonner";
 import { store } from "../store";
 import { addNotification } from "../store/notificationsSlice";
+import { toast } from "sonner";
+import { NotificationType } from "../types";
 
 let pollInterval: NodeJS.Timeout | null = null;
 let isPolling = false;
@@ -145,7 +146,7 @@ const notifyThemeChanged = (theme: "light" | "dark") => {
 
 
 const addTestNotification = (
-  type: "success" | "info" | "warning" | "error",
+  type: NotificationType,
   title: string,
   message: string
 ) => {
