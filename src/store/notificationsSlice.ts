@@ -9,10 +9,22 @@ interface NotificationsState {
 // localStorage key for notifications
 const NOTIFICATIONS_STORAGE_KEY = "bookExplorer_notifications";
 
-// Clean up old notifications (older than 7 days)
-const cleanupOldNotifications = (notifications: Notification[]): Notification[] => {
+// Simple cleanup function: remove old notifications (>7 days) and maintain 25 limit
+const performCleanup = (notifications: Notification[]): Notification[] => {
+  // 1. Remove notifications older than 7 days
   const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-  return notifications.filter(n => n.timestamp > sevenDaysAgo);
+  let cleaned = notifications.filter(n => n.timestamp > sevenDaysAgo);
+  
+  // 2. Maintain max limit of 25 notifications (keep newest)
+  if (cleaned.length > 25) {
+    cleaned = cleaned.sort((a, b) => b.timestamp - a.timestamp).slice(0, 25);
+  }
+  
+  if (cleaned.length !== notifications.length) {
+    console.log(`🧹 Cleanup: ${notifications.length} → ${cleaned.length} notifications (removed old + enforced 25 limit)`);
+  }
+  
+  return cleaned;
 };
 
 // Load notifications from localStorage
@@ -30,10 +42,9 @@ const loadNotificationsFromStorage = (): Notification[] => {
           typeof n.read === 'boolean'
         );
         
-        // Clean up old notifications on load
-        const cleanedNotifications = cleanupOldNotifications(validNotifications);
+        // Perform cleanup on load (remove old + enforce 25 limit)
+        const cleanedNotifications = performCleanup(validNotifications);
         if (cleanedNotifications.length !== validNotifications.length) {
-          console.log(`🧹 Cleaned up ${validNotifications.length - cleanedNotifications.length} old notifications`);
           // Save the cleaned notifications back to localStorage
           saveNotificationsToStorage(cleanedNotifications);
         }
@@ -88,16 +99,14 @@ const notificationsSlice = createSlice({
       
       currentNotifications.unshift(notification);
 
-      // Keep only the last 50 notifications
-      if (currentNotifications.length > 50) {
-        currentNotifications.splice(50);
-      }
+      // Apply cleanup (remove old + enforce 25 limit)
+      const cleanedNotifications = performCleanup(currentNotifications);
       
       // Update Redux state with fresh data
-      state.notifications = currentNotifications;
-      state.unreadCount = calculateUnreadCount(currentNotifications);
+      state.notifications = cleanedNotifications;
+      state.unreadCount = calculateUnreadCount(cleanedNotifications);
       
-      saveNotificationsToStorage(currentNotifications);
+      saveNotificationsToStorage(cleanedNotifications);
     },
     markAsRead: (state, action: PayloadAction<string>) => {
       // Read fresh data from localStorage before making changes
@@ -153,6 +162,19 @@ const notificationsSlice = createSlice({
       
       saveNotificationsToStorage(emptyNotifications);
     },
+    performAutomaticCleanup: (state) => {
+      // Read fresh data from localStorage before making changes
+      const currentNotifications = loadNotificationsFromStorage();
+      
+      // Apply simple cleanup (remove old + enforce 25 limit)
+      const cleanedNotifications = performCleanup(currentNotifications);
+      
+      // Update Redux state with fresh data
+      state.notifications = cleanedNotifications;
+      state.unreadCount = calculateUnreadCount(cleanedNotifications);
+      
+      saveNotificationsToStorage(cleanedNotifications);
+    },
   },
 });
 
@@ -162,6 +184,7 @@ export const {
   markAllAsRead,
   removeNotification,
   clearNotifications,
+  performAutomaticCleanup,
 } = notificationsSlice.actions;
 
 export default notificationsSlice.reducer;
