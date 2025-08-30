@@ -22,17 +22,19 @@ const BookDetailsModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const { selectedBookId } = useAppSelector((state: any) => state.ui);
   const { books } = useAppSelector((state: any) => state.books);
-  const { books: favoriteBooks } = useAppSelector((state: any) => state.favorites);
+  const { books: favoriteBooks } = useAppSelector(
+    (state: any) => state.favorites
+  );
   const { bookIds } = useAppSelector((state: any) => state.favorites);
-  
-  const selectedBook = books.find((book: Book) => book.key === selectedBookId) || 
-                      favoriteBooks.find((book: Book) => book.key === selectedBookId);
-  
+
+  const selectedBook =
+    books.find((book: Book) => book.key === selectedBookId) ||
+    favoriteBooks.find((book: Book) => book.key === selectedBookId);
+
   const isFavorite = selectedBook ? bookIds.includes(selectedBook.key) : false;
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
 
-  // Reset image loading state when selectedBook changes
   useEffect(() => {
     if (selectedBook?.cover_i) {
       setImageLoading(true);
@@ -87,7 +89,6 @@ const BookDetailsModal: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Cover Image */}
             <div className="flex flex-col items-center">
               {hasCover ? (
                 <>
@@ -98,7 +99,7 @@ const BookDetailsModal: React.FC = () => {
                     src={getCoverImageUrl(selectedBook.cover_i!, "L")}
                     alt={selectedBook.title}
                     className={`w-64 h-96 object-cover rounded-lg shadow-lg mb-4 ${
-                      imageLoading ? 'hidden' : 'block'
+                      imageLoading ? "hidden" : "block"
                     }`}
                     onLoad={() => setImageLoading(false)}
                     onError={() => {
@@ -134,7 +135,6 @@ const BookDetailsModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Book Information */}
             <div className="lg:col-span-2 space-y-4">
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-2">
@@ -152,7 +152,6 @@ const BookDetailsModal: React.FC = () => {
                   )}
               </div>
 
-              {/* Publication Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {selectedBook.first_publish_year && (
                   <div className="flex items-center gap-2 text-muted-foreground">
@@ -184,7 +183,6 @@ const BookDetailsModal: React.FC = () => {
                 )}
               </div>
 
-              {/* Subjects */}
               {selectedBook.subject && selectedBook.subject.length > 0 && (
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">
@@ -213,7 +211,6 @@ const BookDetailsModal: React.FC = () => {
                 </div>
               )}
 
-              {/* Description */}
               {selectedBook.description && (
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">
@@ -225,7 +222,6 @@ const BookDetailsModal: React.FC = () => {
                 </div>
               )}
 
-              {/* External Link */}
               <div className="pt-4">
                 <Button
                   variant="outline"

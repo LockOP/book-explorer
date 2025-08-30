@@ -9,17 +9,15 @@ import NotificationSidebar from "./components/NotificationSidebar";
 import BookDetailsModal from "./components/BookDetailsModal";
 import { Toaster } from "./components/ui/sonner";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
-import { useBookPolling } from "./hooks/useBookPolling";
+import { useBookPolling } from "./hooks/bookPolling";
 import { fetchBooks, updateFiltersFromURL } from "./store/booksSlice";
-import { useUrlState } from "./hooks/useUrlState";
-import { SortOption } from "./types";
+import { useUrlState } from "./hooks/urlState";
 
 function AppContent() {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state: any) => state.ui);
   const { getStateFromURL } = useUrlState();
-  
-  // Initialize book polling (polls every 10 seconds)
+
   const { isPolling } = useBookPolling(10000);
 
   useEffect(() => {
@@ -31,14 +29,12 @@ function AppContent() {
   }, [theme]);
 
   useEffect(() => {
-    // Get initial state from URL
     const urlState = getStateFromURL();
     console.log("🏗️ App.tsx initializing with URL state:", urlState);
-    
-    // Update store with URL state
+
     console.log("🏗️ App.tsx dispatching updateFiltersFromURL:", urlState);
     dispatch(updateFiltersFromURL(urlState));
-    
+
     const searchParams = {
       query: urlState.search,
       offset: 0,

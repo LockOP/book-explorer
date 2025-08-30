@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { searchBooks, SearchParams } from "../services/bookService";
-import { Book, BookSearchResponse, BookFilters, SortOption, ViewMode } from "../types";
+import {
+  Book,
+  BookSearchResponse,
+  BookFilters,
+  SortOption,
+  ViewMode,
+} from "../types";
 
 interface BooksState {
   books: Book[];
@@ -13,7 +19,6 @@ interface BooksState {
   currentOffset: number;
 }
 
-// Remove localStorage functions and accept initial state as parameter
 const createInitialState = (initialFilters: BookFilters): BooksState => ({
   books: [],
   loading: false,
@@ -44,32 +49,29 @@ export const loadMoreBooks = createAsyncThunk(
 const booksSlice = createSlice({
   name: "books",
   initialState: createInitialState({
-    search: '', // Start with empty search, will be updated from URL
-    sortBy: 'rating desc',
-    viewMode: 'grid'
+    search: "",
+    sortBy: "rating desc",
+    viewMode: "grid",
   }),
   reducers: {
     setSearch: (state, action: PayloadAction<string>) => {
       state.filters.search = action.payload;
-      // Remove localStorage usage - URL will be updated by the component
-      // Reset pagination when search changes
+
       state.currentOffset = 0;
       state.hasMore = true;
     },
     setSortBy: (state, action: PayloadAction<SortOption>) => {
       state.filters.sortBy = action.payload;
-      // Remove localStorage usage - URL will be updated by the component
-      // Reset pagination when sort changes
+
       state.currentOffset = 0;
       state.hasMore = true;
     },
     setViewMode: (state, action: PayloadAction<ViewMode>) => {
       state.filters.viewMode = action.payload;
-      // Remove localStorage usage - URL will be updated by the component
     },
     updateFiltersFromURL: (state, action: PayloadAction<BookFilters>) => {
       state.filters = action.payload;
-      // Reset pagination when filters change from URL
+
       state.currentOffset = 0;
       state.hasMore = true;
     },
@@ -84,7 +86,7 @@ const booksSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch books (initial search)
+
       .addCase(fetchBooks.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -105,7 +107,7 @@ const booksSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to fetch books";
       })
-      // Load more books (infinite scroll)
+
       .addCase(loadMoreBooks.pending, (state) => {
         state.loadingMore = true;
         state.error = null;
@@ -114,7 +116,7 @@ const booksSlice = createSlice({
         loadMoreBooks.fulfilled,
         (state, action: PayloadAction<BookSearchResponse>) => {
           state.loadingMore = false;
-          // Append new books to existing list
+
           state.books = [...state.books, ...action.payload.docs];
           state.currentOffset += action.payload.docs.length;
           state.hasMore =

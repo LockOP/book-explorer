@@ -54,7 +54,7 @@ const BookListItem: React.FC<BookListItemProps> = ({ book }) => {
                   src={getCoverImageUrl(book.cover_i!)}
                   alt={book.title}
                   className={`w-20 h-28 object-cover rounded group-hover:scale-105 transition-transform duration-200 ${
-                    imageLoading ? 'hidden' : 'block'
+                    imageLoading ? "hidden" : "block"
                   }`}
                   onLoad={() => setImageLoading(false)}
                   onError={() => {

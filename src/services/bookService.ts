@@ -57,7 +57,6 @@ export const getCoverImageUrl = (
   return `https://covers.openlibrary.org/b/id/${coverId}-${size}.jpg`;
 };
 
-// Legacy function kept for compatibility - use DefaultCoverIcon component instead
 export const getDefaultCoverUrl = (): string => {
   const svg = `<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="120" height="120" fill="#f1f5f9"></rect>

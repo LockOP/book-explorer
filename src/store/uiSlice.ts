@@ -49,14 +49,14 @@ const uiSlice = createSlice({
     },
     toggleFavoritesSidebar: (state) => {
       state.favoritesSidebarOpen = !state.favoritesSidebarOpen;
-      // Close notifications sidebar when opening favorites
+
       if (state.favoritesSidebarOpen) {
         state.notificationsSidebarOpen = false;
       }
     },
     toggleNotificationsSidebar: (state) => {
       state.notificationsSidebarOpen = !state.notificationsSidebarOpen;
-      // Close favorites sidebar when opening notifications
+
       if (state.notificationsSidebarOpen) {
         state.favoritesSidebarOpen = false;
       }
@@ -67,7 +67,7 @@ const uiSlice = createSlice({
     setNotificationsSidebarOpen: (state, action: PayloadAction<boolean>) => {
       state.notificationsSidebarOpen = action.payload;
     },
-    // Legacy action for backward compatibility
+
     toggleSidebar: (state) => {
       state.favoritesSidebarOpen = !state.favoritesSidebarOpen;
       if (state.favoritesSidebarOpen) {
@@ -87,7 +87,7 @@ export const {
   toggleNotificationsSidebar,
   setFavoritesSidebarOpen,
   setNotificationsSidebarOpen,
-  toggleSidebar, // Legacy action
+  toggleSidebar,
   setSelectedBook,
 } = uiSlice.actions;
 

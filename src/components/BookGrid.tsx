@@ -1,35 +1,35 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import { BookOpen, Search } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
-import { useUrlState } from "../hooks/useUrlState";
+import { useUrlState } from "../hooks/urlState";
 import { loadMoreBooks, updateFiltersFromURL } from "../store/booksSlice";
 import BookCard from "./BookCard";
 import BookListItem from "./BookListItem";
 
 const BookGrid: React.FC = () => {
   const dispatch = useAppDispatch();
-  const {
-    books,
-    loading,
-    loadingMore,
-    error,
-    filters,
-    totalResults,
-    hasMore,
-  } = useAppSelector((state) => state.books);
+  const { books, loading, loadingMore, error, filters, totalResults, hasMore } =
+    useAppSelector((state) => state.books);
   const { getStateFromURL } = useUrlState();
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync with URL changes
   useEffect(() => {
     const urlState = getStateFromURL();
-    if (urlState.search !== filters.search || 
-        urlState.sortBy !== filters.sortBy || 
-        urlState.viewMode !== filters.viewMode) {
+    if (
+      urlState.search !== filters.search ||
+      urlState.sortBy !== filters.sortBy ||
+      urlState.viewMode !== filters.viewMode
+    ) {
       dispatch(updateFiltersFromURL(urlState));
     }
-  }, [getStateFromURL, filters.search, filters.sortBy, filters.viewMode, dispatch]);
+  }, [
+    getStateFromURL,
+    filters.search,
+    filters.sortBy,
+    filters.viewMode,
+    dispatch,
+  ]);
 
   const handleScroll = useCallback(() => {
     const el = scrollContainerRef.current;

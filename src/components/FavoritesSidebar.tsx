@@ -30,7 +30,7 @@ const BookCoverImage: React.FC<{ book: Book; onClick: () => void }> = ({
             src={getCoverImageUrl(book.cover_i!)}
             alt={book.title}
             className={`w-16 h-24 object-cover rounded group-hover:scale-105 transition-transform duration-200 ${
-              imageLoading ? 'hidden' : 'block'
+              imageLoading ? "hidden" : "block"
             }`}
             onLoad={() => setImageLoading(false)}
             onError={() => {
@@ -57,7 +57,6 @@ const FavoritesSidebar: React.FC = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter favorites based on search query
   const filteredFavorites = favoriteBooks.filter((book: Book) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
@@ -76,7 +75,6 @@ const FavoritesSidebar: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-
 
       if (
         favoritesSidebarOpen &&
@@ -131,10 +129,8 @@ const FavoritesSidebar: React.FC = () => {
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/20 z-40" onClick={handleClose} />
 
-      {/* Sidebar */}
       <div
         ref={sidebarRef}
         className="fixed top-0 right-0 h-full w-80 bg-background border-l border-border shadow-lg z-50 flex flex-col animate-in slide-in-from-right duration-300"
@@ -154,7 +150,6 @@ const FavoritesSidebar: React.FC = () => {
           </Button>
         </div>
 
-        {/* Search Bar */}
         {favoriteBooks.length > 0 && (
           <div className="p-4 border-b border-border">
             <div className="relative">

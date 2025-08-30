@@ -32,37 +32,37 @@ const favoritesSlice = createSlice({
   initialState,
   reducers: {
     addToFavorites: (state, action: PayloadAction<Book>) => {
-      // Read fresh data from localStorage before making changes
       const currentFavorites = loadFavoritesFromStorage();
       const book = action.payload;
-      
+
       if (!currentFavorites.bookIds.includes(book.key)) {
         currentFavorites.bookIds.push(book.key);
         currentFavorites.books.push(book);
-        
-        // Update Redux state with fresh data
+
         state.bookIds = currentFavorites.bookIds;
         state.books = currentFavorites.books;
-        
+
         saveFavoritesToStorage(currentFavorites);
       } else {
-        // Book is already in favorites, sync state with localStorage
         state.bookIds = currentFavorites.bookIds;
         state.books = currentFavorites.books;
       }
     },
     removeFromFavorites: (state, action: PayloadAction<string>) => {
-      // Read fresh data from localStorage before making changes
       const currentFavorites = loadFavoritesFromStorage();
       const bookId = action.payload;
-      
-      currentFavorites.bookIds = currentFavorites.bookIds.filter((id) => id !== bookId);
-      currentFavorites.books = currentFavorites.books.filter((book) => book.key !== bookId);
-      
+
+      currentFavorites.bookIds = currentFavorites.bookIds.filter(
+        (id) => id !== bookId
+      );
+      currentFavorites.books = currentFavorites.books.filter(
+        (book) => book.key !== bookId
+      );
+
       // Update Redux state with fresh data
       state.bookIds = currentFavorites.bookIds;
       state.books = currentFavorites.books;
-      
+
       saveFavoritesToStorage(currentFavorites);
     },
     clearFavorites: (state) => {

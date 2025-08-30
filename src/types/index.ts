@@ -19,7 +19,6 @@ export interface BookSearchResponse {
   docs: Book[];
 }
 
-// New types for book polling mechanism
 export interface BookChange {
   id: string;
   kind: "add-book" | "edit-book";
@@ -76,7 +75,12 @@ export interface Notification {
   read: boolean;
 }
 
-export type SortOption = "rating desc" | "title" | "new" | "old" | "random.daily";
+export type SortOption =
+  | "rating desc"
+  | "title"
+  | "new"
+  | "old"
+  | "random.daily";
 export type ViewMode = "grid" | "list";
 
 export interface BookFilters {

@@ -65,13 +65,11 @@ const NotificationSidebar: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
 
-      // Check if sidebar is open and the click is outside the sidebar
       if (
         notificationsSidebarOpen &&
         sidebarRef.current &&
         !sidebarRef.current.contains(target)
       ) {
-        // Exception: Don't close if clicking on the notifications button in header
         const notificationsButton = target.closest(
           "[data-notifications-trigger]"
         );
@@ -82,7 +80,6 @@ const NotificationSidebar: React.FC = () => {
     };
 
     if (notificationsSidebarOpen) {
-      // Add a small delay to prevent immediate triggering
       const timer = setTimeout(() => {
         document.addEventListener("mousedown", handleClickOutside);
       }, 100);
@@ -138,7 +135,6 @@ const NotificationSidebar: React.FC = () => {
           </Button>
         </div>
 
-        {/* Actions */}
         {notifications.length > 0 && (
           <div className="flex gap-2 p-4 border-b border-border">
             {unreadCount > 0 && (
@@ -164,7 +160,6 @@ const NotificationSidebar: React.FC = () => {
           </div>
         )}
 
-        {/* Notifications List */}
         <div className="flex-1 overflow-y-auto">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">

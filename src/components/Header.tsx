@@ -40,7 +40,6 @@ const Header: React.FC<HeaderProps> = ({ isPolling }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {/* Book Polling Status Indicator */}
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Activity
                   className={`h-4 w-4 ${
