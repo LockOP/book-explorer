@@ -1,6 +1,6 @@
 import React from "react";
-import { BookOpen, Moon, Sun, Heart, Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { BookOpen, Bell, Heart, Sun, Moon, Activity } from "lucide-react";
 import {
   toggleTheme,
   toggleFavoritesSidebar,
@@ -10,13 +10,15 @@ import {
 import { notificationService } from "../services/notificationService";
 import { Button } from "./ui/button";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  isPolling: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ isPolling }) => {
   const dispatch = useAppDispatch();
   const { theme, favoritesSidebarOpen, notificationsSidebarOpen } =
     useAppSelector((state: any) => state.ui);
-  const { unreadCount } = useAppSelector(
-    (state: any) => state.notifications
-  );
+  const { unreadCount } = useAppSelector((state: any) => state.notifications);
   const { bookIds } = useAppSelector((state: any) => state.favorites);
 
   const handleThemeToggle = () => {
@@ -24,8 +26,6 @@ const Header: React.FC = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     notificationService.notifyThemeChanged(newTheme);
   };
-
-
 
   return (
     <>
@@ -40,7 +40,16 @@ const Header: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-
+              {/* Book Polling Status Indicator */}
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <Activity
+                  className={`h-4 w-4 ${
+                    isPolling
+                      ? "text-green-500 animate-pulse"
+                      : "text-muted-foreground"
+                  }`}
+                />
+              </div>
 
               <Button
                 variant="ghost"

@@ -19,6 +19,52 @@ export interface BookSearchResponse {
   docs: Book[];
 }
 
+// New types for book polling mechanism
+export interface BookChange {
+  id: string;
+  kind: "add-book" | "edit-book";
+  timestamp: string;
+  comment?: string;
+  author?: {
+    key: string;
+    name: string;
+  };
+  changes?: Array<{
+    key: string;
+    revision: number;
+    timestamp: string;
+    comment?: string;
+    author?: {
+      key: string;
+      name: string;
+    };
+  }>;
+  data?: {
+    work?: {
+      key: string;
+      title?: string;
+      authors?: Array<{
+        author: {
+          key: string;
+          name: string;
+        };
+      }>;
+    };
+    edition?: {
+      key: string;
+      title?: string;
+      authors?: Array<{
+        key: string;
+        name: string;
+      }>;
+    };
+  };
+}
+
+export interface BookChangesResponse {
+  changes: BookChange[];
+}
+
 export type NotificationType = "success" | "info" | "warning" | "error";
 
 export interface Notification {

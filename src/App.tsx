@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { store } from "./store";
-import { notificationService } from "./services/notificationService";
 import Header from "./components/Header";
 import BookGrid from "./components/BookGrid";
 import SearchBar from "./components/SearchBar";
@@ -10,12 +9,18 @@ import NotificationSidebar from "./components/NotificationSidebar";
 import BookDetailsModal from "./components/BookDetailsModal";
 import { Toaster } from "./components/ui/sonner";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
-import { fetchBooks } from "./store/booksSlice";
+import { useBookPolling } from "./hooks/useBookPolling";
+import { fetchBooks, updateFiltersFromURL } from "./store/booksSlice";
+import { useUrlState } from "./hooks/useUrlState";
 import { SortOption } from "./types";
 
 function AppContent() {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state: any) => state.ui);
+  const { getStateFromURL } = useUrlState();
+  
+  // Initialize book polling (polls every 10 seconds)
+  const { isPolling } = useBookPolling(10000);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -26,22 +31,28 @@ function AppContent() {
   }, [theme]);
 
   useEffect(() => {
-    const savedSearch = localStorage.getItem('bookExplorer_search') || 'type:work';
-    const savedSort = (localStorage.getItem('bookExplorer_sortBy') as SortOption) || 'rating desc';
+    // Get initial state from URL
+    const urlState = getStateFromURL();
+    console.log("🏗️ App.tsx initializing with URL state:", urlState);
+    
+    // Update store with URL state
+    console.log("🏗️ App.tsx dispatching updateFiltersFromURL:", urlState);
+    dispatch(updateFiltersFromURL(urlState));
     
     const searchParams = {
-      query: savedSearch || 'type:work',
+      query: urlState.search,
       offset: 0,
       limit: 20,
-      sort: savedSort,
+      sort: urlState.sortBy,
     };
+    console.log("🏗️ App.tsx fetching books with params:", searchParams);
     dispatch(fetchBooks(searchParams));
-  }, [dispatch]);
+  }, [dispatch, getStateFromURL]);
 
   return (
     <div className={`h-[100dvh] w-[100dvw] ${theme === "dark" ? "dark" : ""}`}>
       <div className="bg-background text-foreground w-full h-full overflow-auto flex flex-col">
-        <Header />
+        <Header isPolling={isPolling} />
         <SearchBar />
         <BookGrid />
         <FavoritesSidebar />
