@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "webpack serve --mode development --open",
     "build": "webpack --mode production",
-    "start": "webpack serve --open --mode development",
-    "serve": "webpack serve --mode development --open --port 3000",
+    "build:local": "webpack --mode production --config webpack.config.local.js",
+    "serve:local": "npx serve dist",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
@@ -19,7 +19,7 @@
     "react",
     "typescript"
   ],
-  "author": "",
+  "author": "Arul Madhava <madhavaarul@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",
