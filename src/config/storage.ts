@@ -1,5 +1,5 @@
 export const STORAGE_KEYS = {
-  FAVORITES: "book-explorer-favorites",
+  FAVORITES: "bookExplorer_favorites",
   NOTIFICATIONS: "bookExplorer_notifications", 
   THEME: "bookExplorer_theme",
   LAST_SEEN_ADD_BOOK_ID: "bookExplorer_lastSeenAddBookId",

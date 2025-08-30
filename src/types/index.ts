@@ -60,10 +60,6 @@ export interface BookChange {
   };
 }
 
-export interface BookChangesResponse {
-  changes: BookChange[];
-}
-
 export type NotificationType = "success" | "info" | "warning" | "error";
 
 export interface Notification {
