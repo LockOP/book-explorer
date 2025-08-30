@@ -76,54 +76,82 @@ const notificationsSlice = createSlice({
       state,
       action: PayloadAction<Omit<Notification, "id" | "timestamp" | "read">>
     ) => {
+      // Read fresh data from localStorage before making changes
+      const currentNotifications = loadNotificationsFromStorage();
+      
       const notification: Notification = {
         ...action.payload,
         id: Date.now().toString(),
         timestamp: Date.now(),
         read: false,
       };
-      state.notifications.unshift(notification);
-      state.unreadCount += 1;
+      
+      currentNotifications.unshift(notification);
 
       // Keep only the last 50 notifications
-      if (state.notifications.length > 50) {
-        state.notifications = state.notifications.slice(0, 50);
+      if (currentNotifications.length > 50) {
+        currentNotifications.splice(50);
       }
-      saveNotificationsToStorage(state.notifications);
+      
+      // Update Redux state with fresh data
+      state.notifications = currentNotifications;
+      state.unreadCount = calculateUnreadCount(currentNotifications);
+      
+      saveNotificationsToStorage(currentNotifications);
     },
     markAsRead: (state, action: PayloadAction<string>) => {
-      const notification = state.notifications.find(
+      // Read fresh data from localStorage before making changes
+      const currentNotifications = loadNotificationsFromStorage();
+      
+      const notification = currentNotifications.find(
         (n) => n.id === action.payload
       );
       if (notification && !notification.read) {
         notification.read = true;
-        state.unreadCount -= 1;
       }
-      saveNotificationsToStorage(state.notifications);
+      
+      // Update Redux state with fresh data
+      state.notifications = currentNotifications;
+      state.unreadCount = calculateUnreadCount(currentNotifications);
+      
+      saveNotificationsToStorage(currentNotifications);
     },
     markAllAsRead: (state) => {
-      state.notifications.forEach((notification) => {
+      // Read fresh data from localStorage before making changes
+      const currentNotifications = loadNotificationsFromStorage();
+      
+      currentNotifications.forEach((notification) => {
         notification.read = true;
       });
+      
+      // Update Redux state with fresh data
+      state.notifications = currentNotifications;
       state.unreadCount = 0;
-      saveNotificationsToStorage(state.notifications);
+      
+      saveNotificationsToStorage(currentNotifications);
     },
     removeNotification: (state, action: PayloadAction<string>) => {
-      const notification = state.notifications.find(
-        (n) => n.id === action.payload
-      );
-      if (notification && !notification.read) {
-        state.unreadCount -= 1;
-      }
-      state.notifications = state.notifications.filter(
+      // Read fresh data from localStorage before making changes
+      const currentNotifications = loadNotificationsFromStorage();
+      
+      const filteredNotifications = currentNotifications.filter(
         (n) => n.id !== action.payload
       );
-      saveNotificationsToStorage(state.notifications);
+      
+      // Update Redux state with fresh data
+      state.notifications = filteredNotifications;
+      state.unreadCount = calculateUnreadCount(filteredNotifications);
+      
+      saveNotificationsToStorage(filteredNotifications);
     },
     clearNotifications: (state) => {
-      state.notifications = [];
+      const emptyNotifications: Notification[] = [];
+      
+      // Update Redux state
+      state.notifications = emptyNotifications;
       state.unreadCount = 0;
-      saveNotificationsToStorage(state.notifications);
+      
+      saveNotificationsToStorage(emptyNotifications);
     },
   },
 });
