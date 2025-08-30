@@ -26,8 +26,6 @@ function AppContent() {
   }, [theme]);
 
   useEffect(() => {
-    notificationService.startPolling();
-    
     const savedSearch = localStorage.getItem('bookExplorer_search') || 'type:work';
     const savedSort = (localStorage.getItem('bookExplorer_sortBy') as SortOption) || 'rating desc';
     
@@ -38,9 +36,6 @@ function AppContent() {
       sort: savedSort,
     };
     dispatch(fetchBooks(searchParams));
-    return () => {
-      notificationService.stopPolling();
-    };
   }, [dispatch]);
 
   return (

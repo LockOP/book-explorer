@@ -19,6 +19,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const { bookIds } = useAppSelector((state: any) => state.favorites);
   const isFavorite = bookIds.includes(book.key);
   const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(!!book.cover_i);
 
   const handleToggleFavorite = () => {
     if (isFavorite) {
@@ -41,12 +42,23 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
       <div onClick={handleBookClick}>
         <div className="relative">
           {hasCover ? (
-            <img
-              src={getCoverImageUrl(book.cover_i!)}
-              alt={book.title}
-              className="w-full h-64 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200"
-              onError={() => setImageError(true)}
-            />
+            <>
+              {imageLoading && (
+                <div className="w-full h-64 bg-muted-foreground animate-pulse rounded-t-lg" />
+              )}
+              <img
+                src={getCoverImageUrl(book.cover_i!)}
+                alt={book.title}
+                className={`w-full h-64 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200 ${
+                  imageLoading ? 'hidden' : 'block'
+                }`}
+                onLoad={() => setImageLoading(false)}
+                onError={() => {
+                  setImageError(true);
+                  setImageLoading(false);
+                }}
+              />
+            </>
           ) : (
             <div className="w-full h-64 rounded-t-lg group-hover:scale-105 transition-transform duration-200 flex items-center justify-center">
               <DefaultCoverIcon className="w-full h-full" />

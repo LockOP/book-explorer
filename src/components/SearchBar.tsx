@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { useDebounce } from "../hooks/debounce";
+
 import {
   setSearch,
   setSortBy,
@@ -27,14 +27,13 @@ const SearchBar: React.FC = () => {
     (state) => state.books
   );
   const [searchTerm, setSearchTerm] = useState(filters.search);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterFocused, setIsFilterFocused] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  useEffect(() => {
-    setSearchTerm(filters.search);
-  }, [filters.search]);
+
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,31 +45,35 @@ const SearchBar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (debouncedSearchTerm !== filters.search) {
-      dispatch(setSearch(debouncedSearchTerm));
-      dispatch(resetBooks());
-      if (debouncedSearchTerm.trim()) {
-        const searchParams = {
-          query: debouncedSearchTerm,
-          offset: 0,
-          limit: 20,
-          sort: filters.sortBy,
-        };
-        dispatch(fetchBooks(searchParams)).then((result) => {
-          if (result.meta.requestStatus === "fulfilled" && result.payload) {
-            const response = result.payload as any;
-            notificationService.notifySearchResultsUpdated(
-              debouncedSearchTerm,
-              response.numFound || 0
-            );
-          }
-        });
-      } else {
-        // Clear search results when search is empty
-        dispatch(setSearch(""));
+    const timer = setTimeout(() => {
+      if (searchTerm !== filters.search) {
+        dispatch(setSearch(searchTerm));
+        dispatch(resetBooks());
+        if (searchTerm.trim()) {
+          const searchParams = {
+            query: searchTerm,
+            offset: 0,
+            limit: 20,
+            sort: filters.sortBy,
+          };
+          dispatch(fetchBooks(searchParams)).then((result) => {
+            if (result.meta.requestStatus === "fulfilled" && result.payload) {
+              const response = result.payload as any;
+              notificationService.notifySearchResultsUpdated(
+                searchTerm,
+                response.numFound || 0
+              );
+            }
+          });
+        } else {
+          // Clear search results when search is empty
+          dispatch(setSearch(""));
+        }
       }
-    }
-  }, [debouncedSearchTerm, dispatch, filters.search, filters.sortBy]);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, dispatch, filters.search, filters.sortBy]);
 
   // Force list view on mobile
   useEffect(() => {
@@ -89,6 +92,16 @@ const SearchBar: React.FC = () => {
     dispatch(setSortBy(value as SortOption));
     dispatch(resetBooks()); // Clear existing books when sort changes
 
+    // Show notification for sort change
+    const sortLabels: Record<SortOption, string> = {
+      "rating desc": "Popular",
+      "title": "Title",
+      "new": "Newest",
+      "old": "Oldest",
+      "random.daily": "Random"
+    };
+    notificationService.notifySortChanged(sortLabels[value as SortOption]);
+
     // Trigger new search with updated sort
     const query = filters.search.trim() || "";
     const searchParams = {
@@ -104,12 +117,24 @@ const SearchBar: React.FC = () => {
     // Only allow view mode change on desktop
     if (window.innerWidth >= 768) {
       dispatch(setViewMode(mode));
+      // Show notification for view mode change
+      notificationService.notifyViewModeChanged(mode);
     }
   };
 
   const handleClearSearch = () => {
     setSearchTerm("");
     dispatch(setSearch(""));
+    dispatch(resetBooks());
+    
+    // Fetch default books immediately
+    const searchParams = {
+      query: "type:work",
+      offset: 0,
+      limit: 20,
+      sort: filters.sortBy,
+    };
+    dispatch(fetchBooks(searchParams));
   };
 
   const handleFilterFocus = () => {
@@ -164,7 +189,8 @@ const SearchBar: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearSearch}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted/80 z-10"
+                title="Clear search"
               >
                 ×
               </Button>

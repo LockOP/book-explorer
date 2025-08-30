@@ -25,6 +25,8 @@ const Header: React.FC = () => {
     notificationService.notifyThemeChanged(newTheme);
   };
 
+
+
   return (
     <>
       <header className="bg-card border-b border-border w-full">
@@ -38,6 +40,8 @@ const Header: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+
+
               <Button
                 variant="ghost"
                 size="icon"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Heart,
@@ -22,15 +22,29 @@ const BookDetailsModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const { selectedBookId } = useAppSelector((state: any) => state.ui);
   const { books } = useAppSelector((state: any) => state.books);
+  const { books: favoriteBooks } = useAppSelector((state: any) => state.favorites);
   const { bookIds } = useAppSelector((state: any) => state.favorites);
+  
+  const selectedBook = books.find((book: Book) => book.key === selectedBookId) || 
+                      favoriteBooks.find((book: Book) => book.key === selectedBookId);
+  
+  const isFavorite = selectedBook ? bookIds.includes(selectedBook.key) : false;
   const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
 
-  // Find the selected book
-  const selectedBook = books.find((book: Book) => book.key === selectedBookId);
+  // Reset image loading state when selectedBook changes
+  useEffect(() => {
+    if (selectedBook?.cover_i) {
+      setImageLoading(true);
+      setImageError(false);
+    } else {
+      setImageLoading(false);
+      setImageError(false);
+    }
+  }, [selectedBook?.cover_i]);
 
   if (!selectedBook) return null;
 
-  const isFavorite = bookIds.includes(selectedBook.key);
   const hasCover = selectedBook.cover_i && !imageError;
 
   const handleClose = () => {
@@ -76,12 +90,23 @@ const BookDetailsModal: React.FC = () => {
             {/* Cover Image */}
             <div className="flex flex-col items-center">
               {hasCover ? (
-                <img
-                  src={getCoverImageUrl(selectedBook.cover_i!, "L")}
-                  alt={selectedBook.title}
-                  className="w-64 h-96 object-cover rounded-lg shadow-lg mb-4"
-                  onError={() => setImageError(true)}
-                />
+                <>
+                  {imageLoading && (
+                    <div className="w-64 h-96 bg-muted-foreground animate-pulse rounded-lg shadow-lg mb-4" />
+                  )}
+                  <img
+                    src={getCoverImageUrl(selectedBook.cover_i!, "L")}
+                    alt={selectedBook.title}
+                    className={`w-64 h-96 object-cover rounded-lg shadow-lg mb-4 ${
+                      imageLoading ? 'hidden' : 'block'
+                    }`}
+                    onLoad={() => setImageLoading(false)}
+                    onError={() => {
+                      setImageError(true);
+                      setImageLoading(false);
+                    }}
+                  />
+                </>
               ) : (
                 <div className="w-64 h-96 rounded-lg shadow-lg mb-4 flex items-center justify-center">
                   <DefaultCoverIcon className="w-full h-full" />

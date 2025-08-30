@@ -16,17 +16,29 @@ const BookCoverImage: React.FC<{ book: Book; onClick: () => void }> = ({
   onClick,
 }) => {
   const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(!!book.cover_i);
   const hasCover = book.cover_i && !imageError;
 
   return (
     <div className="flex-shrink-0 cursor-pointer" onClick={onClick}>
       {hasCover ? (
-        <img
-          src={getCoverImageUrl(book.cover_i!)}
-          alt={book.title}
-          className="w-16 h-24 object-cover rounded group-hover:scale-105 transition-transform duration-200"
-          onError={() => setImageError(true)}
-        />
+        <>
+          {imageLoading && (
+            <div className="w-16 h-24 bg-muted-foreground animate-pulse rounded" />
+          )}
+          <img
+            src={getCoverImageUrl(book.cover_i!)}
+            alt={book.title}
+            className={`w-16 h-24 object-cover rounded group-hover:scale-105 transition-transform duration-200 ${
+              imageLoading ? 'hidden' : 'block'
+            }`}
+            onLoad={() => setImageLoading(false)}
+            onError={() => {
+              setImageError(true);
+              setImageLoading(false);
+            }}
+          />
+        </>
       ) : (
         <div className="w-16 h-24 rounded group-hover:scale-105 transition-transform duration-200 flex items-center justify-center">
           <DefaultCoverIcon className="w-full h-full" />
