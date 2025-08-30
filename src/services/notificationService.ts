@@ -1,9 +1,8 @@
 import { store } from "../store";
 import { addNotification } from "../store/notificationsSlice";
 import { toast } from "sonner";
-import { NotificationType, BookChange } from "../types";
+import { BookChange } from "../types";
 import { NOTIFICATION_CONFIG } from "../config";
-import axios from "axios";
 
 const lastNotificationTimes: Record<string, number> = {};
 
@@ -18,29 +17,6 @@ const canShowNotification = (notificationType: string): boolean => {
   }
 
   return false;
-};
-
-const showNotificationWithDeduplication = (
-  notificationType: string,
-  title: string,
-  message: string,
-  toastType: "info" | "success" | "warning" | "error" = "info",
-  duration: number = 5000
-): void => {
-  if (canShowNotification(notificationType)) {
-    store.dispatch(
-      addNotification({
-        title,
-        message,
-        type: toastType as NotificationType,
-      })
-    );
-
-    toast[toastType](title, {
-      description: message,
-      duration,
-    });
-  }
 };
 
 const notifyFavoriteAdded = (bookTitle: string) => {
@@ -75,20 +51,6 @@ const notifySearchResultsUpdated = (query: string, resultCount: number) => {
     type: "info" as const,
     title: "Search Results Updated",
     message: `Found ${resultCount} books for "${query}"`,
-  };
-
-  store.dispatch(addNotification(notification));
-
-  toast.info(notification.title, {
-    description: notification.message,
-  });
-};
-
-const notifyNewRecommendations = () => {
-  const notification = {
-    type: "info" as const,
-    title: "New Recommendations",
-    message: "Check out these new book recommendations!",
   };
 
   store.dispatch(addNotification(notification));
@@ -137,59 +99,7 @@ const notifyViewModeChanged = (mode: "grid" | "list") => {
   });
 };
 
-export const notifyBookChange = async (change: BookChange): Promise<void> => {
-  let title = "Book Change";
-  let message = "A book change has been detected";
-
-  if (change.data?.work?.title) {
-    title = change.data.work.title;
-  } else if (change.data?.edition?.title) {
-    title = change.data.edition.title;
-  } else if (change.changes && change.changes.length > 0) {
-    try {
-      const bookKey = change.changes[0].key;
-      if (bookKey && bookKey.startsWith("/books/")) {
-        const response = await axios.get(
-          `https://openlibrary.org${bookKey}.json`
-        );
-        if (response.data.title) {
-          title = response.data.title;
-        }
-      }
-    } catch (error) {
-      console.warn("Could not fetch book title:", error);
-    }
-  }
-
-  switch (change.kind) {
-    case "add-book":
-      title = `New Book Added: ${title}`;
-      message = `A new book "${title}" has been added to Open Library`;
-      break;
-    case "edit-book":
-      title = `Book Updated: ${title}`;
-      message = `Book "${title}" has been updated in Open Library`;
-      break;
-    default:
-      title = `Book Change: ${title}`;
-      message = `Book "${title}" has been modified in Open Library`;
-  }
-
-  store.dispatch(
-    addNotification({
-      title,
-      message,
-      type: "info",
-    })
-  );
-
-  toast.info(title, {
-    description: message,
-    duration: 5000,
-  });
-};
-
-export const notifyMultipleBookChanges = async (
+const notifyMultipleBookChanges = async (
   changes: BookChange[]
 ): Promise<void> => {
   if (changes.length === 0) return;
@@ -240,10 +150,6 @@ export const notifyMultipleBookChanges = async (
   }
 };
 
-const isSupported = () => {
-  return true;
-};
-
 export const notificationService = {
   notifyFavoriteAdded,
   notifyFavoriteRemoved,
@@ -251,7 +157,5 @@ export const notificationService = {
   notifySortChanged,
   notifyViewModeChanged,
   notifyThemeChanged,
-  notifyBookChange,
   notifyMultipleBookChanges,
-  isSupported,
 };
