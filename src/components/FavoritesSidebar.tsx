@@ -50,10 +50,8 @@ const BookCoverImage: React.FC<{ book: Book; onClick: () => void }> = ({
 
 const FavoritesSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { favoritesSidebarOpen } = useAppSelector((state: any) => state.ui);
-  const { books: favoriteBooks } = useAppSelector(
-    (state: any) => state.favorites
-  );
+  const { favoritesSidebarOpen } = useAppSelector((state) => state.ui);
+  const { books: favoriteBooks } = useAppSelector((state) => state.favorites);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
 

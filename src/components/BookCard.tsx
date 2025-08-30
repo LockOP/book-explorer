@@ -16,7 +16,7 @@ interface BookCardProps {
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const dispatch = useAppDispatch();
-  const { bookIds } = useAppSelector((state: any) => state.favorites);
+  const { bookIds } = useAppSelector((state) => state.favorites);
   const isFavorite = bookIds.includes(book.key);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(!!book.cover_i);
@@ -50,7 +50,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
                 src={getCoverImageUrl(book.cover_i!)}
                 alt={book.title}
                 className={`w-full h-64 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-200 ${
-                  imageLoading ? 'hidden' : 'block'
+                  imageLoading ? "hidden" : "block"
                 }`}
                 onLoad={() => setImageLoading(false)}
                 onError={() => {

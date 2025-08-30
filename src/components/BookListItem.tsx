@@ -16,7 +16,7 @@ interface BookListItemProps {
 
 const BookListItem: React.FC<BookListItemProps> = ({ book }) => {
   const dispatch = useAppDispatch();
-  const { bookIds } = useAppSelector((state: any) => state.favorites);
+  const { bookIds } = useAppSelector((state) => state.favorites);
   const isFavorite = bookIds.includes(book.key);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(!!book.cover_i);

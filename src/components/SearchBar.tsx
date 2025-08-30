@@ -36,7 +36,9 @@ const SearchBar: React.FC = () => {
   } = useUrlState();
 
   const getDisplaySearchValue = (search: string) => {
-    return search === DEFAULT_VALUES.DEFAULT_SEARCH_QUERY || !search ? "" : search;
+    return search === DEFAULT_VALUES.DEFAULT_SEARCH_QUERY || !search
+      ? ""
+      : search;
   };
 
   const [searchTerm, setSearchTerm] = useState(
@@ -44,7 +46,10 @@ const SearchBar: React.FC = () => {
   );
   const [isClearing, setIsClearing] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const debouncedSearchTerm = useDebounce(searchTerm, DEFAULT_VALUES.DEBOUNCE_DELAY);
+  const debouncedSearchTerm = useDebounce(
+    searchTerm,
+    DEFAULT_VALUES.DEBOUNCE_DELAY
+  );
   const [isMobile, setIsMobile] = useState(false);
   const [isFilterFocused, setIsFilterFocused] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -145,7 +150,10 @@ const SearchBar: React.FC = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < DEFAULT_VALUES.MOBILE_BREAKPOINT && filters.viewMode !== "list") {
+      if (
+        window.innerWidth < DEFAULT_VALUES.MOBILE_BREAKPOINT &&
+        filters.viewMode !== "list"
+      ) {
         dispatch(setViewMode("list"));
         setUrlViewMode("list");
       }

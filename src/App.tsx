@@ -16,7 +16,7 @@ import { DEFAULT_VALUES } from "./config";
 
 function AppContent() {
   const dispatch = useAppDispatch();
-  const { theme } = useAppSelector((state: any) => state.ui);
+  const { theme } = useAppSelector((state) => state.ui);
   const { getStateFromURL } = useUrlState();
 
   const { isPolling } = useBookPolling();

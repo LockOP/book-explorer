@@ -20,12 +20,10 @@ import { Card, CardContent } from "./ui/card";
 
 const BookDetailsModal: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { selectedBookId } = useAppSelector((state: any) => state.ui);
-  const { books } = useAppSelector((state: any) => state.books);
-  const { books: favoriteBooks } = useAppSelector(
-    (state: any) => state.favorites
-  );
-  const { bookIds } = useAppSelector((state: any) => state.favorites);
+  const { selectedBookId } = useAppSelector((state) => state.ui);
+  const { books } = useAppSelector((state) => state.books);
+  const { books: favoriteBooks } = useAppSelector((state) => state.favorites);
+  const { bookIds } = useAppSelector((state) => state.favorites);
 
   const selectedBook =
     books.find((book: Book) => book.key === selectedBookId) ||

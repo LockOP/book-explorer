@@ -6,7 +6,7 @@ import { DEFAULT_VALUES } from "../../config";
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme } = useAppSelector((state: any) => state.ui);
+  const { theme } = useAppSelector((state) => state.ui);
 
   return (
     <Sonner

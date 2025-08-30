@@ -16,10 +16,9 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ isPolling }) => {
   const dispatch = useAppDispatch();
-  const { theme, favoritesSidebarOpen, notificationsSidebarOpen } =
-    useAppSelector((state: any) => state.ui);
-  const { unreadCount } = useAppSelector((state: any) => state.notifications);
-  const { bookIds } = useAppSelector((state: any) => state.favorites);
+  const { theme } = useAppSelector((state) => state.ui);
+  const { unreadCount } = useAppSelector((state) => state.notifications);
+  const { bookIds } = useAppSelector((state) => state.favorites);
 
   const handleThemeToggle = () => {
     dispatch(toggleTheme());

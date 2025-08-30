@@ -51,9 +51,9 @@ const formatTimeAgo = (timestamp: number) => {
 
 const NotificationSidebar: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { notificationsSidebarOpen } = useAppSelector((state: any) => state.ui);
+  const { notificationsSidebarOpen } = useAppSelector((state) => state.ui);
   const { notifications, unreadCount } = useAppSelector(
-    (state: any) => state.notifications
+    (state) => state.notifications
   );
   const sidebarRef = useRef<HTMLDivElement>(null);
 

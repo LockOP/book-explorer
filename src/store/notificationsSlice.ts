@@ -30,12 +30,11 @@ const loadNotificationsFromStorage = (): Notification[] => {
 
       if (Array.isArray(notifications)) {
         const validNotifications = notifications.filter(
-          (n: any) =>
+          (n) =>
             n &&
             typeof n === "object" &&
             n.id &&
-            n.title &&
-            n.message &&
+            n.title & n.message &&
             n.type &&
             typeof n.timestamp === "number" &&
             typeof n.read === "boolean"
