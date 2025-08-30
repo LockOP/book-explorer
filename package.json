@@ -2,12 +2,15 @@
   "name": "book-explorer",
   "version": "1.0.0",
   "description": "A web application for browsing, searching, and exploring books using the Open Library API",
+  "homepage": "https://github.com/LockOP/book-explorer",
   "main": "index.js",
   "scripts": {
     "dev": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "start": "webpack serve --mode development --open",
-    "serve": "webpack serve --mode development --open --port 3000"
+    "start": "webpack serve --open --mode development",
+    "serve": "webpack serve --mode development --open --port 3000",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [
     "books",
@@ -40,6 +43,7 @@
     "autoprefixer": "^10.4.16",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.8.1",
+    "gh-pages": "^6.3.0",
     "html-webpack-plugin": "^5.5.3",
     "postcss": "^8.4.31",
     "postcss-loader": "^7.3.3",
