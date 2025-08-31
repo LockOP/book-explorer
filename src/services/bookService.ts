@@ -20,7 +20,7 @@ export const searchBooks = async (
       `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SEARCH}`,
       {
         params: {
-          q: query,
+          q: `title:${query} OR author:${query}`,
           offset: params.offset || DEFAULT_VALUES.SEARCH_OFFSET,
           limit: params.limit || DEFAULT_VALUES.SEARCH_LIMIT,
           sort: sort,
