@@ -5,7 +5,7 @@
   "homepage": "https://github.com/LockOP/book-explorer",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve --mode development --open",
+    "dev": "webpack serve --mode development --open --config webpack.config.local.js",
     "build": "webpack --mode production",
     "build:local": "webpack --mode production --config webpack.config.local.js",
     "serve:local": "npx serve dist",
